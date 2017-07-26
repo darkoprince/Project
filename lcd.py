@@ -19,18 +19,27 @@
 #import
 import RPi.GPIO as GPIO
 import time
-#led import
-from gpiozero import LED, Button
-from signal import pause
-from time import sleep
-import urllib2
 
+# Define GPIO to LCD mapping
+LCD_RS = 26
+LCD_E  = 19
+LCD_D4 = 13 
+LCD_D5 = 6
+LCD_D6 = 5
+LCD_D7 = 11
+LED_ON = 15
 
-led = LED(17)
-button_pressed = Button(2)
+# Define some device constants
+LCD_WIDTH = 16    # Maximum characters per line
+LCD_CHR = True
+LCD_CMD = False
 
-def ifttt():
-        urllib2.urlopen("https://maker.ifttt.com/trigger/woman_inlabour/with/key/mth3UwjXe5RsyLclHaatC4562E8gL5JIujqqmn2Q0KH").read()
+LCD_LINE_1 = 0x80 # LCD RAM address for the 1st line
+LCD_LINE_2 = 0xC0 # LCD RAM address for the 2nd line 
+
+# Timing constants
+E_PULSE = 0.00005
+E_DELAY = 0.00005
 
 def main():
   # Main program block
@@ -74,14 +83,18 @@ def lcd_init():
   lcd_byte(0x33,LCD_CMD)
   lcd_byte(0x32,LCD_CMD)
   lcd_byte(0x28,LCD_CMD)
-  lcd_byte(0x0C,LCD_CMD)
+  lcd_byte(0x0C,LCD_CMD)  
   lcd_byte(0x06,LCD_CMD)
-  lcd_byte(0x01,LCD_CMD)
+  lcd_byte(0x01,LCD_CMD)  
 
 def lcd_string(message,style):
+  # Send string to display
+  # style=1 Left justified
+  # style=2 Centred
+  # style=3 Right justified
 
   if style==1:
-    message = message.ljust(LCD_WIDTH," ")
+    message = message.ljust(LCD_WIDTH," ")  
   elif style==2:
     message = message.center(LCD_WIDTH," ")
   elif style==3:
@@ -91,6 +104,10 @@ def lcd_string(message,style):
     lcd_byte(ord(message[i]),LCD_CHR)
 
 def lcd_byte(bits, mode):
+  # Send byte to data pins
+  # bits = data
+  # mode = True  for character
+  #        False for command
 
   GPIO.output(LCD_RS, mode) # RS
 
@@ -109,13 +126,13 @@ def lcd_byte(bits, mode):
     GPIO.output(LCD_D7, True)
 
   # Toggle 'Enable' pin
-  time.sleep(E_DELAY)
-  GPIO.output(LCD_E, True)
+  time.sleep(E_DELAY)    
+  GPIO.output(LCD_E, True)  
   time.sleep(E_PULSE)
-  GPIO.output(LCD_E, False)
-  time.sleep(E_DELAY)
+  GPIO.output(LCD_E, False)  
+  time.sleep(E_DELAY)      
 
- # Low bits
+  # Low bits
   GPIO.output(LCD_D4, False)
   GPIO.output(LCD_D5, False)
   GPIO.output(LCD_D6, False)
@@ -130,64 +147,16 @@ def lcd_byte(bits, mode):
     GPIO.output(LCD_D7, True)
 
   # Toggle 'Enable' pin
-  time.sleep(E_DELAY)
-  GPIO.output(LCD_E, True)
+  time.sleep(E_DELAY)    
+  GPIO.output(LCD_E, True)  
   time.sleep(E_PULSE)
-  GPIO.output(LCD_E, False)
-  time.sleep(E_DELAY)
+  GPIO.output(LCD_E, False)  
+  time.sleep(E_DELAY)   
+
+if __name__ == '__main__':
+  main()
 
 
 
-button_pressed.when_pressed = ifttt
-button_pressed.when_pressed = lcd_init
 
-button_pressed.when_pressed = led.on
-button_pressed.when_released = led.off
-
-# Define GPIO to LCD mapping
-LCD_RS = 26
-LCD_E  = 19
-LCD_D4 = 13
-LCD_D5 = 6
-LCD_D6 = 5
-LCD_D7 = 11
-LED_ON = 15
-
-# Define some device constants
-LCD_WIDTH = 16    # Maximum characters per line
-LCD_CHR = True
-LCD_CMD = False
-
-LCD_LINE_1 = 0x80 # LCD RAM address for the 1st line
-LCD_LINE_2 = 0xC0 # LCD RAM address for the 2nd line 
-
-# Timing constants
-E_PULSE = 0.00005
-E_DELAY = 0.00005
-
-
-  if bits&0x01==0x01:
-    GPIO.output(LCD_D4, True)
-  if bits&0x02==0x02:
-    GPIO.output(LCD_D5, True)
-  if bits&0x04==0x04:
-    GPIO.output(LCD_D6, True)
-  if bits&0x08==0x08:
-    GPIO.output(LCD_D7, True)
-
-  # Toggle 'Enable' pin
-  time.sleep(E_DELAY)
-  GPIO.output(LCD_E, True)
-  time.sleep(E_PULSE)
-  GPIO.output(LCD_E, False)
-  time.sleep(E_DELAY)
-
- if __name__ == '__main__':
-	main()  
-
-#calling functions
-
-ifttt()
-
-pause()
 

@@ -6,13 +6,13 @@ led = LED(17)
 
 def dot():
         led.on()
-        sleep(0.1)
+        sleep(3)
         led.off()
         sleep(0.1)
 
 def dash():
         led.on()
-        sleep(1)
+        sleep(3)
         led.off()
         sleep(1)
      
@@ -39,7 +39,7 @@ def e():
         dash()
         dot()
 def c():
-         dash()
+        dash()
         dot()
         dash()
         dot()
@@ -99,7 +99,7 @@ client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
-client.connect('moorhouseassociates.com', 1883, 60)
+client.connect('broker.hivemq.com', 1883, 8000)
 
 client.loop_forever()
 
