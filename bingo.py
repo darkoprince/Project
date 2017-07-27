@@ -1,8 +1,16 @@
-from gpiozero import LED
-from time import sleep
 import paho.mqtt.client as mqtt
+from gpiozero import LED, Button
+from signal import pause
+from time import sleep
+
+
+
 
 led = LED(17)
+button_pressed = Button(2)
+
+client = mqtt.Client()
+client.connect('broker.hivemq.com', 1883, 60)
 
 def dot():
         led.on()
@@ -78,11 +86,7 @@ def notification():
         r()
         e()
         c()
-	o() 
-
-
-
-
+	o()
 	m()
 	i()
 	n()
@@ -96,14 +100,20 @@ def on_message(client, userdata, message):
 
 def on_connect(client, userdata, flags, code):
         print "connected:" + str(code)
-        client.subscribe("test/all")
+        client.subscribe("test/richie")
 
+def button_press():
+	print 'button pressed'
+	
 
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
-client.connect('broker.hivemq.com', 1883, 8000)
+client.connect('broker.hivemq.com', 1883, 60)
+
+button-pressed.when_pressed = button_press
+
+pause()
 
 client.loop_forever()
-
